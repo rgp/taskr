@@ -3,13 +3,17 @@
 Time tracker for tasks.
 
 ### Instalation
-```./install
+```
+./install
+```
 
 ### Usage
-```./taskr
 
-######OR
 ```
+./taskr
+
+# OR
+
 PATH=$PATH:/path_to_taskr
 export PATH
 ```
