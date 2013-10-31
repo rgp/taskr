@@ -17,11 +17,11 @@ from termcolor import colored
 from prettytable import PrettyTable
 from os.path import expanduser
 
-class Tasker():
+class Taskr():
 
   taskslog_name = "task_log"
   errorlog = "error.log"
-  tasker_path = ".tasker/"
+  taskr_path = ".taskr/"
   readableStatus = {
       0:colored("Closed","cyan"),
       1:colored("Active","green"),
@@ -29,7 +29,7 @@ class Tasker():
   
   def __init__(self):
     home = expanduser("~") + "/"
-    self.root = home + self.tasker_path
+    self.root = home + self.taskr_path
     logging.basicConfig(filename=self.root + self.errorlog, level=logging.DEBUG)
     self.taskslog_path = self.root + self.taskslog_name
     try:
@@ -133,7 +133,7 @@ class Tasker():
     self.tasks.append(
         {
           "name" : name,
-          "id" : int(time.time()) - 1383190000,
+          "id" : int(time.time()) - 1383100000,
           "estimated" : estimated,
           "status" : 1,
           "worklog" : {int(time.time()):{"duration":0}}
@@ -147,17 +147,17 @@ class NoTaskException(Exception):
 
 if __name__ == "__main__":
 
-  parser = argparse.ArgumentParser(description='Tasker helps you keep track of time!')
+  parser = argparse.ArgumentParser(description='Taskr helps you keep track of time!')
   parser.add_argument("-n", metavar="'write some code'", help='Task name')
   parser.add_argument("-e", metavar="estimated hours", type=float, help='Estimated time in hours')
   parser.add_argument("-i", metavar="", nargs="?", const=True, help='Pause current task')
   parser.add_argument("-p", metavar="", nargs="?", const=True, dest="i", help='Pause current task')
   parser.add_argument("-r", metavar="", nargs="?", const=True, help='Resume current task')
   parser.add_argument("-c", metavar="", nargs="?", const=True, help='Close current task')
-  parser.add_argument("-s", metavar="", nargs="?", const=True, help='Show tasker status')
+  parser.add_argument("-s", metavar="", nargs="?", const=True, help='Show taskr status')
   args = parser.parse_args()
 
-  taskr = Tasker()
+  taskr = Taskr()
   if args.i is not None:
     taskr.pauseCurrentTask()
   elif args.r is not None:
