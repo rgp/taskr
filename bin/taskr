@@ -123,6 +123,17 @@ class Taskr():
     last_session = last_task["worklog"][last_session_time]
     last_session["duration"] = (time.time() - last_session_time) / 3600
 
+  def deleteTask(self,task_id=True):
+    try:
+      if task_id != True:
+        last_task = self.__findtask(int(task_id))[-1]
+      else:
+        raise NoTaskException("")
+      self.tasks.remove(last_task)
+    except Exception as e:
+      print colored("Couldn't delete task","cyan")
+      self.printTasks()
+
   def newTask(self, name=None, estimated=None):
     name = colored("Untitled","red") if name == None else name
     estimated = 0.0 if estimated == None else estimated
@@ -154,6 +165,7 @@ if __name__ == "__main__":
   parser.add_argument("-p", metavar="", nargs="?", const=True, dest="i", help='Pause current task')
   parser.add_argument("-r", metavar="", nargs="?", const=True, help='Resume current task')
   parser.add_argument("-c", metavar="", nargs="?", const=True, help='Close current task')
+  parser.add_argument("-d", metavar="", nargs="?", const=True, help='Close current task')
   parser.add_argument("-s", metavar="", nargs="?", const=True, help='Show taskr status')
   args = parser.parse_args()
 
@@ -162,6 +174,9 @@ if __name__ == "__main__":
     taskr.pauseCurrentTask()
   elif args.r is not None:
     taskr.resumeCurrentTask(args.r)
+  elif args.d is not None:
+    taskr.deleteTask(args.d)
+    taskr.printTasks()
   elif args.c is not None:
     try:
       taskr.closeCurrentTask()
