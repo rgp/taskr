@@ -16,6 +16,8 @@ import yaml, sys, logging, time, datetime, argparse, operator
 from termcolor import colored
 from prettytable import PrettyTable
 from os.path import expanduser
+from os.path import isdir
+from os import mkdir
 
 class Taskr():
 
@@ -29,6 +31,8 @@ class Taskr():
   
   def __init__(self):
     home = expanduser("~") + "/"
+    if not isdir(home+".taskr"):
+      mkdir(home + ".taskr") 
     self.root = home + self.taskr_path
     logging.basicConfig(filename=self.root + self.errorlog, level=logging.DEBUG)
     self.taskslog_path = self.root + self.taskslog_name
@@ -187,6 +191,7 @@ if __name__ == "__main__":
   parser.add_argument("-p", metavar="", nargs="?", const=True, dest="i", help='Pause current task')
   parser.add_argument("-r", metavar="", nargs="?", const=True, help='Resume current task')
   parser.add_argument("-c", metavar="", nargs="?", const=True, help='Close current task')
+  parser.add_argument("-cr", metavar="", nargs="?", const=True, help='Close current task and resume previous paused one')
   parser.add_argument("-d", metavar="", nargs="?", const=True, help='Close current task')
   parser.add_argument("-s", metavar="", nargs="?", const=True, help='Show taskr status')
   args = parser.parse_args()
@@ -198,8 +203,6 @@ if __name__ == "__main__":
     except NoTaskException as nte:
       print colored("No active task","red")
       self.printTasks()
-  elif args.r is not None:
-    taskr.resumeCurrentTask(args.r)
   elif args.d is not None:
     taskr.deleteTask(args.d)
     taskr.printTasks()
@@ -209,6 +212,15 @@ if __name__ == "__main__":
     except NoTaskException as nte:
       print colored("No active task","red")
       taskr.printTasks()
+  elif args.r is not None:
+    taskr.resumeCurrentTask(args.r)
+  elif args.cr is not None:
+    try:
+      taskr.closeCurrentTask()
+    except NoTaskException as nte:
+      print colored("No active task","red")
+      taskr.printTasks()
+    taskr.resumeCurrentTask(args.cr)
   elif args.s is not None:
     taskr.printTasks()
   elif args.n is not None:
