@@ -1,4 +1,4 @@
-## Tasker 
+## Taskr 
 ===============
 Time tracker for tasks.
 
