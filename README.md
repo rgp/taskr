@@ -7,6 +7,10 @@ Time tracker for tasks.
 # Clone repo
 git clone https://github.com/rgp/taskr.git /usr/local/taskr
 
+# Install Requirements
+# Requires pip
+pip install -r requirements.txt
+
 # Add taskr to PATH
 echo "export PATH=$PATH:/usr/local/taskr/bin" >> ~/.bash_profile
 
