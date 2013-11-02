@@ -1,3 +1,8 @@
+v0.5.0 ----
+* Adds all option to display all tasks
+* Adds open option
+* Changes round to ceil
+* Bugfix on task stack when closing tasks
 
 v0.4.0 ----
 * Adds close and resume option
