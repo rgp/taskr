@@ -14,6 +14,7 @@
 
 import yaml, sys, logging, time, datetime, argparse, operator
 from termcolor import colored
+from math import ceil
 from prettytable import PrettyTable
 from os.path import expanduser
 from os.path import isdir
@@ -69,6 +70,10 @@ class Taskr():
   def __datefmt(self,time):
     return datetime.datetime.fromtimestamp(time).strftime('%Y-%m-%d %H:%M:%S')
 
+  def __roundup(self,number,decimals):
+    val = pow(10,decimals)
+    return ceil(number * val) / val
+
   def printTasks(self):
     if len(self.tasks) > 0:
       print "Your current task log:"
@@ -78,7 +83,7 @@ class Taskr():
         last_session_time = max(task["worklog"].iteritems(), key=operator.itemgetter(0))[0]
         cur_sess_time = (time.time()-last_session_time)/3600 if task["status"] == 1 else 0
         total_time = task["elapsed"] + cur_sess_time if task["status"] == 1 else task["elapsed"]
-        output.add_row([task["id"],task["name"],len(task["worklog"]), self.__datefmt(last_session_time), round(cur_sess_time,2), round(total_time,2), self.readableStatus[task["status"]]])
+        output.add_row([task["id"],task["name"],len(task["worklog"]), self.__datefmt(last_session_time), self.__roundup(cur_sess_time,2), self.__roundup(total_time,2), self.readableStatus[task["status"]]])
       print output.get_string(border=False)
     else:
       print "You currently don't have any registered tasks"
@@ -91,7 +96,7 @@ class Taskr():
     last_session_time = max(task["worklog"].iteritems(), key=operator.itemgetter(0))[0]
     cur_sess_time = (time.time()-last_session_time)/3600 if task["status"] == 1 else 0
     total_time = task["elapsed"] + cur_sess_time if task["status"] == 1 else task["elapsed"]
-    output.add_row([task["id"],task["name"],len(task["worklog"]), self.__datefmt(last_session_time), round(cur_sess_time,2), round(total_time,2), self.readableStatus[task["status"]]])
+    output.add_row([task["id"],task["name"],len(task["worklog"]), self.__datefmt(last_session_time), self.__roundup(cur_sess_time,2), self.__roundup(total_time,2), self.readableStatus[task["status"]]])
     print output.get_string(border=False)
 
   def closeCurrentTask(self):
