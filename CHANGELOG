@@ -1,3 +1,6 @@
+v0.5.1 ----
+* Bugfix while resuming previously paused task
+
 v0.5.0 ----
 * Adds all option to display all tasks
 * Adds open option

@@ -157,6 +157,8 @@ class Taskr():
       if last_task["status"] == 0:
         raise Exception("")
       else:
+        self.tasks.remove(last_task)
+        self.tasks.append(last_task)
         last_task["status"] = 1
         last_task["worklog"][int(time.time())] = {"duration":0}
     except Exception as e:
