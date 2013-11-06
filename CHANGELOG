@@ -1,3 +1,6 @@
+v0.6.0 ----
+* Timelog now in human form (#h #m)
+
 v0.5.1 ----
 * Bugfix while resuming previously paused task
 

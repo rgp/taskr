@@ -74,16 +74,26 @@ class Taskr():
     val = pow(10,decimals)
     return ceil(number * val) / val
 
+  def __hourstohuman(self,time):
+    minutes = self.__roundup((time - int(time)),0)
+    hours = self.__roundup(time - minutes,2)
+    return str(int(hours))+"h "+str(int(minutes))+"m"
+
+  def __preparerow(self,task):
+    last_session_time = max(task["worklog"].iteritems(), key=operator.itemgetter(0))[0]
+    cur_sess_time = self.__roundup((time.time()-last_session_time)/3600,2) if task["status"] == 1 else 0
+    total_time = self.__roundup(task["elapsed"] + cur_sess_time,2) if task["status"] == 1 else task["elapsed"]
+    cur_sess_time = self.__hourstohuman(cur_sess_time)
+    total_time = self.__hourstohuman(total_time)
+    return [task["id"],task["name"],len(task["worklog"]), self.__datefmt(last_session_time), cur_sess_time, total_time, self.readableStatus[task["status"]]]
+
   def printTasks(self,all=False):
     if len(self.tasks) > 0:
       print "Your current task log:"
-      output = PrettyTable(["ID","Task","WorkSessions","Last Worked On","Current session (hr)","Total time (hr)","Status"])
+      output = PrettyTable(["ID","Task","WorkSessions","Last Worked On","Curr session","Total time","Status"])
       output.align["Task"]
       for task in self.tasks[-5:] if not all else self.tasks:
-        last_session_time = max(task["worklog"].iteritems(), key=operator.itemgetter(0))[0]
-        cur_sess_time = (time.time()-last_session_time)/3600 if task["status"] == 1 else 0
-        total_time = task["elapsed"] + cur_sess_time if task["status"] == 1 else task["elapsed"]
-        output.add_row([task["id"],task["name"],len(task["worklog"]), self.__datefmt(last_session_time), self.__roundup(cur_sess_time,2), self.__roundup(total_time,2), self.readableStatus[task["status"]]])
+        output.add_row(self.__preparerow(task))
       print output.get_string(border=False)
     else:
       print "You currently don't have any registered tasks"
@@ -93,10 +103,7 @@ class Taskr():
       return False
     output = PrettyTable(["ID","Task","WorkSessions","Last Worked On","Current session (hr)","Total time (hr)","Status"])
     output.align["Task"]
-    last_session_time = max(task["worklog"].iteritems(), key=operator.itemgetter(0))[0]
-    cur_sess_time = (time.time()-last_session_time)/3600 if task["status"] == 1 else 0
-    total_time = task["elapsed"] + cur_sess_time if task["status"] == 1 else task["elapsed"]
-    output.add_row([task["id"],task["name"],len(task["worklog"]), self.__datefmt(last_session_time), self.__roundup(cur_sess_time,2), self.__roundup(total_time,2), self.readableStatus[task["status"]]])
+    output.add_row(self.__preparerow(task))
     print output.get_string(border=False)
 
   def closeCurrentTask(self):
