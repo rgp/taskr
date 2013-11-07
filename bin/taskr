@@ -75,8 +75,8 @@ class Taskr():
     return ceil(number * val) / val
 
   def __hourstohuman(self,time):
-    dec = (time - int(time)
-    minutes = self.__roundup(dec*60),0)
+    dec = (time - int(time))
+    minutes = self.__roundup(dec*60,0)
     hours = self.__roundup(time - dec,2)
     return str(int(hours))+"h "+str(int(minutes))+"m"
 
