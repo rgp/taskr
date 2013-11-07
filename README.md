@@ -7,6 +7,9 @@ Time tracker for tasks.
 # Clone repo
 git clone https://github.com/rgp/taskr.git /usr/local/taskr
 
+# Change to directory
+cd /usr/local/taskr
+
 # Install Requirements
 # Requires pip
 pip install -r requirements.txt
