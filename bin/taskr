@@ -75,8 +75,9 @@ class Taskr():
     return ceil(number * val) / val
 
   def __hourstohuman(self,time):
-    minutes = self.__roundup((time - int(time)),0)
-    hours = self.__roundup(time - minutes,2)
+    dec = (time - int(time)
+    minutes = self.__roundup(dec*60),0)
+    hours = self.__roundup(time - dec,2)
     return str(int(hours))+"h "+str(int(minutes))+"m"
 
   def __preparerow(self,task):
@@ -234,7 +235,7 @@ if __name__ == "__main__":
       taskr.pauseCurrentTask()
     except NoTaskException as nte:
       print colored("No active task","red")
-      self.printTasks()
+      taskr.printTasks()
   elif args.d is not None:
     taskr.deleteTask(args.d)
     taskr.printTasks()

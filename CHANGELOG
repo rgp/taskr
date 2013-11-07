@@ -1,3 +1,7 @@
+v0.6.1 ----
+* Bugfix while displaying minutes in human format
+* Bugfix print task when pausing an inactive task (thanks @rogeliog)
+
 v0.6.0 ----
 * Timelog now in human form (#h #m)
 
