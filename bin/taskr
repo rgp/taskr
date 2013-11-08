@@ -19,6 +19,7 @@ from prettytable import PrettyTable
 from os.path import expanduser
 from os.path import isdir
 from os import mkdir
+import hashlib
 
 class Taskr():
 
@@ -86,12 +87,12 @@ class Taskr():
     total_time = self.__roundup(task["elapsed"] + cur_sess_time,2) if task["status"] == 1 else task["elapsed"]
     cur_sess_time = self.__hourstohuman(cur_sess_time)
     total_time = self.__hourstohuman(total_time)
-    return [task["id"],task["name"],len(task["worklog"]), self.__datefmt(last_session_time), cur_sess_time, total_time, self.readableStatus[task["status"]]]
+    return [str(task["id"])[0:8],task["name"],len(task["worklog"]), self.__datefmt(last_session_time), cur_sess_time, total_time, self.readableStatus[task["status"]]]
 
   def printTasks(self,all=False):
     if len(self.tasks) > 0:
       print "Your current task log:"
-      output = PrettyTable(["ID","Task","WorkSessions","Last Worked On","Curr session","Total time","Status"])
+      output = PrettyTable(["ID","Task","Sessions","Last Worked On","Curr session","Total time","Status"])
       output.align["Task"]
       for task in self.tasks[-5:] if not all else self.tasks:
         output.add_row(self.__preparerow(task))
@@ -102,7 +103,7 @@ class Taskr():
   def printTask(self,task=None):
     if task is None:
       return False
-    output = PrettyTable(["ID","Task","WorkSessions","Last Worked On","Current session (hr)","Total time (hr)","Status"])
+    output = PrettyTable(["ID","Task","Sessions","Last Worked On","Current session","Total time","Status"])
     output.align["Task"]
     output.add_row(self.__preparerow(task))
     print output.get_string(border=False)
@@ -200,7 +201,7 @@ class Taskr():
     self.tasks.append(
         {
           "name" : name,
-          "id" : int(time.time()) - 1383100000,
+          "id" : hashlib.sha1(name + " " + str(int(time.time()))).hexdigest(),
           "estimated" : estimated,
           "elapsed" : 0,
           "status" : 1,
