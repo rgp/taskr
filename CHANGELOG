@@ -1,3 +1,7 @@
+v0.6.2 ----
+* Removes "hr" from task summary when closing
+* Cahnges id for hash created from name and timestamp
+
 v0.6.1 ----
 * Bugfix while displaying minutes in human format
 * Bugfix print task when pausing an inactive task (thanks @rogeliog)
