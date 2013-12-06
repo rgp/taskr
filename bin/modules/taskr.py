@@ -81,10 +81,22 @@ class Taskr():
     return str(int(hours))+"h "+str(int(minutes))+"m"
 
   def __tableHeader(self):
-    o = PrettyTable(["ID","Task","Sessions","Last Worked On","Curr session","Total time","Status"])
+    o = PrettyTable(["ID","Task","Last Worked On","Curr session","Total time","Status"])
     return o
 
   def __preparerow(self,task):
+    last_session_time = max(task["worklog"].iteritems(), key=operator.itemgetter(0))[0]
+    cur_sess_time = self.__roundup((time.time()-last_session_time)/3600,2) if task["status"] == 1 else 0
+    total_time = self.__roundup(task["elapsed"] + cur_sess_time,2) if task["status"] == 1 else task["elapsed"]
+    cur_sess_time = self.__hourstohuman(cur_sess_time)
+    total_time = self.__hourstohuman(total_time)
+    return [str(task["id"])[0:8],task["name"], self.__datefmt(last_session_time), cur_sess_time, total_time, self.readableStatus[task["status"]]]
+
+  def __tablefullHeader(self):
+    o = PrettyTable(["ID","Task","Sessions","Last Worked On","Curr session","Total time","Status"])
+    return o
+
+  def __preparefullrow(self,task):
     last_session_time = max(task["worklog"].iteritems(), key=operator.itemgetter(0))[0]
     cur_sess_time = self.__roundup((time.time()-last_session_time)/3600,2) if task["status"] == 1 else 0
     total_time = self.__roundup(task["elapsed"] + cur_sess_time,2) if task["status"] == 1 else task["elapsed"]
@@ -103,12 +115,19 @@ class Taskr():
     else:
       print "You currently don't have any registered tasks"
 
+  def taskInfo(self,tid):
+    try:
+      task = self.__findtask(int(tid))[-1]
+      self.printTask(task)
+    except Exception as e:
+      print e
+
   def printTask(self,task=None):
     if task is None:
       return False
-    output = self.__tableHeader()
+    output = self.__tablefullHeader()
     output.align["Task"]
-    output.add_row(self.__preparerow(task))
+    output.add_row(self.__preparefullrow(task))
     print output.get_string(border=False)
 
   def closeCurrentTask(self):
