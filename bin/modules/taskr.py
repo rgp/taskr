@@ -2,6 +2,7 @@
 # name: "Tarea 1"
 # id: 1
 # status: 1 | 2 | 0      -> 1 active, 2 paused, 0 closed
+# tag: ""
 # worklog:
 #   -
 #     started_at: 1383167335
@@ -67,7 +68,7 @@ class Taskr():
       sys.exit(1)
 
   def __datefmt(self,time):
-    return datetime.datetime.fromtimestamp(time).strftime('%Y-%m-%d %H:%M:%S')
+    return datetime.datetime.fromtimestamp(time).strftime('%y-%m-%d %H:%M')
 
   def __roundup(self,number,decimals):
     val = pow(10,decimals)
@@ -78,6 +79,10 @@ class Taskr():
     minutes = self.__roundup(dec*60,0)
     hours = self.__roundup(time - dec,2)
     return str(int(hours))+"h "+str(int(minutes))+"m"
+
+  def __tableHeader(self):
+    o = PrettyTable(["ID","Task","Sessions","Last Worked On","Curr session","Total time","Status"])
+    return o
 
   def __preparerow(self,task):
     last_session_time = max(task["worklog"].iteritems(), key=operator.itemgetter(0))[0]
@@ -90,7 +95,7 @@ class Taskr():
   def printTasks(self,all=False):
     if len(self.tasks) > 0:
       print "Your current task log:"
-      output = PrettyTable(["ID","Task","Sessions","Last Worked On","Curr session","Total time","Status"])
+      output = self.__tableHeader()
       output.align["Task"]
       for task in self.tasks[-5:] if not all else self.tasks:
         output.add_row(self.__preparerow(task))
@@ -101,7 +106,7 @@ class Taskr():
   def printTask(self,task=None):
     if task is None:
       return False
-    output = PrettyTable(["ID","Task","Sessions","Last Worked On","Current session","Total time","Status"])
+    output = self.__tableHeader()
     output.align["Task"]
     output.add_row(self.__preparerow(task))
     print output.get_string(border=False)
@@ -145,7 +150,7 @@ class Taskr():
     elif len(tasks) < 1:
       raise Exception("Task not found")
     else:
-      return tasks[0]
+      return tasks
 
   def openTask(self,task_id=None):
     try:
@@ -168,13 +173,14 @@ class Taskr():
     try:
       last_task = self.__findtask(int(task_id))[-1] if task_id != True else self.tasks[-1]
       if last_task["status"] == 0:
-        raise Exception("")
+        raise Exception("Closed task")
       else:
         self.tasks.remove(last_task)
         self.tasks.append(last_task)
         last_task["status"] = 1
         last_task["worklog"][int(time.time())] = {"duration":0}
     except Exception as e:
+      print e
       print colored("No paused task","cyan")
       self.printTasks()
 
