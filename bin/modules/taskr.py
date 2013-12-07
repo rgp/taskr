@@ -29,6 +29,16 @@ class Taskr():
       0:colored("Closed","cyan"),
       1:colored("Active","green"),
       2:colored("Paused","yellow",None,["blink"])}
+  colors = {
+      0:"grey",
+      1:"red",
+      2:"green",
+      3:"yellow",
+      4:"blue",
+      5:"magenta",
+      6:"cyan",
+      7:"white"
+      }
   
   def __init__(self):
     home = expanduser("~") + "/"
@@ -37,6 +47,7 @@ class Taskr():
     self.root = home + self.taskr_path
     logging.basicConfig(filename=self.root + self.errorlog, level=logging.DEBUG)
     self.taskslog_path = self.root + self.taskslog_name
+    self.tags = {}
     try:
       self.log = open(self.taskslog_path,"r+")
     except IOError as ioe:
@@ -81,8 +92,14 @@ class Taskr():
     return str(int(hours))+"h "+str(int(minutes))+"m"
 
   def __tableHeader(self):
-    o = PrettyTable(["ID","Task","Last Worked On","Curr session","Total time","Status"])
+    o = PrettyTable(["ID","Task","Tag","Last Worked On","Curr session","Total time","Status"])
     return o
+
+  def __colorTags(self,tag):
+    if tag not in self.tags:
+      cindex = len(self.tags) % 8
+      self.tags[tag] = colored(tag,self.colors[cindex])
+    return self.tags[tag]
 
   def __preparerow(self,task):
     last_session_time = max(task["worklog"].iteritems(), key=operator.itemgetter(0))[0]
@@ -90,10 +107,14 @@ class Taskr():
     total_time = self.__roundup(task["elapsed"] + cur_sess_time,2) if task["status"] == 1 else task["elapsed"]
     cur_sess_time = self.__hourstohuman(cur_sess_time)
     total_time = self.__hourstohuman(total_time)
-    return [str(task["id"])[0:8],task["name"], self.__datefmt(last_session_time), cur_sess_time, total_time, self.readableStatus[task["status"]]]
+    try:
+      tag = task["tag"]
+    except KeyError:
+      tag = "-"
+    return [str(task["id"])[0:8],task["name"],self.__colorTags(tag), self.__datefmt(last_session_time), cur_sess_time, total_time, self.readableStatus[task["status"]]]
 
   def __tablefullHeader(self):
-    o = PrettyTable(["ID","Task","Sessions","Last Worked On","Curr session","Total time","Status"])
+    o = PrettyTable(["ID","Task","Tag","Sessions","Last Worked On","Curr session","Total time","Status"])
     return o
 
   def __preparefullrow(self,task):
@@ -102,13 +123,18 @@ class Taskr():
     total_time = self.__roundup(task["elapsed"] + cur_sess_time,2) if task["status"] == 1 else task["elapsed"]
     cur_sess_time = self.__hourstohuman(cur_sess_time)
     total_time = self.__hourstohuman(total_time)
-    return [str(task["id"])[0:8],task["name"],len(task["worklog"]), self.__datefmt(last_session_time), cur_sess_time, total_time, self.readableStatus[task["status"]]]
+    try:
+      tag = task["tag"]
+    except KeyError:
+      tag = "-"
+    return [str(task["id"])[0:8],task["name"],tag,len(task["worklog"]), self.__datefmt(last_session_time), cur_sess_time, total_time, self.readableStatus[task["status"]]]
 
   def printTasks(self,all=False):
     if len(self.tasks) > 0:
       print "Your current task log:"
       output = self.__tableHeader()
       output.align["Task"]
+      self.tags["-"] = self.__colorTags("-")
       for task in self.tasks[-5:] if not all else self.tasks:
         output.add_row(self.__preparerow(task))
       print output.get_string(border=False)
@@ -117,7 +143,7 @@ class Taskr():
 
   def taskInfo(self,tid):
     try:
-      task = self.__findtask(int(tid))[-1]
+      task = self.__findtask(tid)[-1]
       self.printTask(task)
     except Exception as e:
       print e
@@ -177,7 +203,7 @@ class Taskr():
     except NoTaskException as nte:
       pass
     try:
-      task = self.__findtask(int(task_id))[-1]
+      task = self.__findtask(task_id)[-1]
       if task["status"] == 0:
         task["status"] = 1
         task["worklog"][int(time.time())] = {"duration":0}
@@ -190,7 +216,7 @@ class Taskr():
 
   def resumeCurrentTask(self,task_id=True):
     try:
-      last_task = self.__findtask(int(task_id))[-1] if task_id != True else self.tasks[-1]
+      last_task = self.__findtask(task_id)[-1] if task_id != True else self.tasks[-1]
       if last_task["status"] == 0:
         raise Exception("Closed task")
       else:
@@ -220,7 +246,7 @@ class Taskr():
       print colored("Couldn't delete task","cyan")
       self.printTasks()
 
-  def newTask(self, name=None, estimated=None):
+  def newTask(self, name=None, estimated=None, tag=""):
     name = colored("Untitled","red") if name == None else name
     estimated = 0.0 if estimated == None else estimated
     try:
@@ -231,6 +257,7 @@ class Taskr():
         {
           "name" : name,
           "id" : hashlib.sha1(name + " " + str(int(time.time()))).hexdigest(),
+          "tag" : tag,
           "estimated" : estimated,
           "elapsed" : 0,
           "status" : 1,

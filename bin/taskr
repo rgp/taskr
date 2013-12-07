@@ -8,6 +8,7 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Taskr helps you keep track of time!')
   parser.add_argument("-n", metavar="'write some code'", help='Task name')
   parser.add_argument("-e", metavar="estimated hours", type=float, help='Estimated time in hours')
+  parser.add_argument("-t", metavar="tag", type=str, help='Tag')
   parser.add_argument("-i", metavar="", nargs="?", const=True, help='Pause current task')
   parser.add_argument("-p", metavar="", nargs="?", const=True, dest="i", help='Pause current task')
   parser.add_argument("-r", metavar="", nargs="?", const=True, help='Resume current task')
@@ -54,7 +55,7 @@ if __name__ == "__main__":
   elif args.all is not None:
     taskr.printTasks(True)
   elif args.n is not None:
-    taskr.newTask(args.n,args.e)
+    taskr.newTask(args.n,args.e,args.t)
   else:
     taskr.printTasks()
 
