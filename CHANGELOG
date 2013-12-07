@@ -1,3 +1,8 @@
+v0.6.3 ----
+* Adds task info through --info TASKID
+* Adds stats
+* Introduces tags
+
 v0.6.2 ----
 * Removes "hr" from task summary when closing
 * Cahnges id for hash created from name and timestamp
