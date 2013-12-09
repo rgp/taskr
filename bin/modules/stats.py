@@ -2,7 +2,6 @@ import time
 import BaseHTTPServer
 from os.path import expanduser
 from math import ceil
-# from . import taskr as t
 t = __import__("taskr")
 
 
@@ -83,41 +82,44 @@ def show():
 
 def timeline(s):
   taskr = t.Taskr()
-  task = taskr._Taskr__findtask(s.path[1:])
-  s.wfile.write("<h3>"+task["name"]+"</h3>")
-  l = len(task["worklog"])
-  render = '<div id="example1" style="width: 900px; height: '+str(l*38+100)+'px;"></div>'
-  render +=  """
-  <script type="text/javascript">
-google.setOnLoadCallback(drawChart);
+  try:
+    task = taskr._Taskr__findtask(s.path[1:])
+    s.wfile.write("<h3>"+task["name"]+"</h3>")
+    l = len(task["worklog"])
+    render = '<div id="example1" style="width: 900px; height: '+str(l*38+100)+'px;"></div>'
+    render +=  """
+    <script type="text/javascript">
+  google.setOnLoadCallback(drawChart);
 
-function drawChart() {
-  var container = document.getElementById('example1');
-  a = container;
+  function drawChart() {
+    var container = document.getElementById('example1');
+    a = container;
 
-  var chart = new google.visualization.Timeline(container);
+    var chart = new google.visualization.Timeline(container);
 
-  var dataTable = new google.visualization.DataTable();
+    var dataTable = new google.visualization.DataTable();
 
-  dataTable.addColumn({ type: 'string', id: 'Session' });
-  dataTable.addColumn({ type: 'date', id: 'Start' });
-  dataTable.addColumn({ type: 'date', id: 'End' });
+    dataTable.addColumn({ type: 'string', id: 'Session' });
+    dataTable.addColumn({ type: 'date', id: 'Start' });
+    dataTable.addColumn({ type: 'date', id: 'End' });
 
-  dataTable.addRows([ """
-  i = 1
-  for w in sorted(task["worklog"]):
-    log = task["worklog"][w]
-    h,m = hoursmins(log["duration"])
-    render += "[ 'Session "+str(i)+"', new Date("+str(w)+"*1000), "+ ("new Date("+str(w+log["duration"]*3600)+"*1000)" if log["duration"] != 0 else "new Date()") +" ]"
-    render += "," if i < l else ""
-    i += 1
-  render += "]);"
-  render += """
-  chart.draw(dataTable);
-}
-</script>
-"""
-  s.wfile.write(render)
+    dataTable.addRows([ """
+    i = 1
+    for w in sorted(task["worklog"]):
+      log = task["worklog"][w]
+      h,m = hoursmins(log["duration"])
+      render += "[ 'Session "+str(i)+"', new Date("+str(w)+"*1000), "+ ("new Date("+str(w+log["duration"]*3600)+"*1000)" if log["duration"] != 0 else "new Date()") +" ]"
+      render += "," if i < l else ""
+      i += 1
+    render += "]);"
+    render += """
+    chart.draw(dataTable);
+  }
+  </script>
+  """
+    s.wfile.write(render)
+  except Exception:
+    s.wfile.write("Task not found")
 
 def load_tasks():
   return t.Taskr().tasks

@@ -193,9 +193,10 @@ class Taskr():
     if len(tasks) > 1:
       raise Exception("Duplicate task id")
     elif len(tasks) < 1:
-      raise Exception("Task not found")
+      exm = "Task "+str(tid)+" not found"
+      raise Exception(exm)
     else:
-      return tasks
+      return tasks[-1]
 
   def openTask(self,task_id=None):
     try:
@@ -203,7 +204,7 @@ class Taskr():
     except NoTaskException as nte:
       pass
     try:
-      task = self.__findtask(task_id)[-1]
+      task = self.__findtask(task_id)
       if task["status"] == 0:
         task["status"] = 1
         task["worklog"][int(time.time())] = {"duration":0}
@@ -216,7 +217,7 @@ class Taskr():
 
   def resumeCurrentTask(self,task_id=True):
     try:
-      last_task = self.__findtask(task_id)[-1] if task_id != True else self.tasks[-1]
+      last_task = self.__findtask(task_id) if task_id != True else self.tasks[-1]
       if last_task["status"] == 0:
         raise Exception("Closed task")
       else:
@@ -238,7 +239,7 @@ class Taskr():
   def deleteTask(self,task_id=True):
     try:
       if task_id != True:
-        last_task = self.__findtask(task_id)[-1]
+        last_task = self.__findtask(task_id)
       else:
         raise NoTaskException("")
       self.tasks.remove(last_task)
