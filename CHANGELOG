@@ -1,3 +1,6 @@
+v1.0.0 ----
+* Changes structure to Models (no Legacy support)
+
 v0.6.3 ----
 * Adds task info through --info TASKID
 * Adds stats

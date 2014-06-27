@@ -1,7 +1,7 @@
 #!/usr/bin/env python 
 
 import argparse
-from modules import taskr as t
+from lib.taskr.Taskr import Taskr
 
 if __name__ == "__main__":
 
@@ -21,7 +21,7 @@ if __name__ == "__main__":
   parser.add_argument("--info", metavar="", nargs="?", const=True, help='Show all taskr status')
   args = parser.parse_args()
 
-  taskr = t.Taskr()
+  taskr = Taskr()
   if args.i is not None:
     try:
       taskr.pauseCurrentTask()

@@ -1,16 +1,3 @@
-#
-# name: "Tarea 1"
-# id: 1
-# status: 1 | 2 | 0      -> 1 active, 2 paused, 0 closed
-# tag: ""
-# worklog:
-#   -
-#     started_at: 1383167335
-#     duration: 3
-#   -
-#     started_at: 1383181735
-#     duration: 1
-
 import yaml, sys, logging, time, datetime, operator
 from termcolor import colored
 from math import ceil
@@ -62,7 +49,7 @@ class Taskr():
 
   def __loadtasks(self):
     try:
-      self.tasks = yaml.load(self.log) or []
+      self.tasks = Task.load_all(self.log) or []
     except Exception as e:
       print "Error loading tasks"
       logging.error(e)
@@ -92,8 +79,7 @@ class Taskr():
     return str(int(hours))+"h "+str(int(minutes))+"m"
 
   def __tableHeader(self):
-    o = PrettyTable(["ID","Task","Tag","Last Worked On","Curr session","Total time","Status"])
-    return o
+    return PrettyTable(["ID","Task","Tag","Last Worked On","Curr session","Total time","Status"])
 
   def __colorTags(self,tag):
     if tag not in self.tags:
@@ -102,32 +88,30 @@ class Taskr():
     return self.tags[tag]
 
   def __preparerow(self,task):
-    last_session_time = max(task["worklog"].iteritems(), key=operator.itemgetter(0))[0]
-    cur_sess_time = self.__roundup((time.time()-last_session_time)/3600,2) if task["status"] == 1 else 0
-    total_time = self.__roundup(task["elapsed"] + cur_sess_time,2) if task["status"] == 1 else task["elapsed"]
-    cur_sess_time = self.__hourstohuman(cur_sess_time)
-    total_time = self.__hourstohuman(total_time)
     try:
-      tag = task["tag"]
-    except KeyError:
-      tag = "-"
-    return [str(task["id"])[0:8],task["name"],self.__colorTags(tag), self.__datefmt(last_session_time), cur_sess_time, total_time, self.readableStatus[task["status"]]]
+      last_session = task.last_session()
+      cur_sess_time = self.__roundup((time.time()-last_session.start_time)/3600,2) if task.status == 1 else 0
+      total_time = self.__roundup(task.elapsed + cur_sess_time,2) if task.status == 1 else task.elapsed
+      cur_sess_time = self.__hourstohuman(cur_sess_time)
+      total_time = self.__hourstohuman(total_time)
+    except NoLastSessionException:
+      return [str(task.id)[0:8],task.name,task.tag,len(task.worklog),"-", 0, 0, self.readableStatus[task.status]]
+    return [str(task.id)[0:8],task.name,self.__colorTags(task.tag), self.__datefmt(last_session.start_time), cur_sess_time, total_time, self.readableStatus[task.status]]
 
   def __tablefullHeader(self):
-    o = PrettyTable(["ID","Task","Tag","Sessions","Last Worked On","Curr session","Total time","Status"])
-    return o
+    return PrettyTable(["ID","Task","Tag","Sessions","Last Worked On","Curr session","Total time","Status"])
 
   def __preparefullrow(self,task):
-    last_session_time = max(task["worklog"].iteritems(), key=operator.itemgetter(0))[0]
-    cur_sess_time = self.__roundup((time.time()-last_session_time)/3600,2) if task["status"] == 1 else 0
-    total_time = self.__roundup(task["elapsed"] + cur_sess_time,2) if task["status"] == 1 else task["elapsed"]
-    cur_sess_time = self.__hourstohuman(cur_sess_time)
-    total_time = self.__hourstohuman(total_time)
     try:
-      tag = task["tag"]
-    except KeyError:
-      tag = "-"
-    return [str(task["id"])[0:8],task["name"],tag,len(task["worklog"]), self.__datefmt(last_session_time), cur_sess_time, total_time, self.readableStatus[task["status"]]]
+      last_session = task.last_session()
+      last_session_time = last_session.start_time
+      cur_sess_time = self.__roundup((time.time()-last_session_time)/3600,2) if task["status"] == 1 else 0
+      total_time = self.__roundup(task["elapsed"] + cur_sess_time,2) if task["status"] == 1 else task["elapsed"]
+      cur_sess_time = self.__hourstohuman(cur_sess_time)
+      total_time = self.__hourstohuman(total_time)
+    except NoLastSessionException:
+      return [str(task.id)[0:8],task.name,task.tag,len(task.worklog),"-", 0, 0, self.readableStatus[task.status]]
+    return [str(task.id)[0:8],task.name,task.tag,len(task.worklog), self.__datefmt(last_session.start_time), cur_sess_time, total_time, self.readableStatus[task.status]]
 
   def printTasks(self,all=False):
     if len(self.tasks) > 0:
@@ -135,7 +119,7 @@ class Taskr():
       output = self.__tableHeader()
       output.align["Task"]
       self.tags["-"] = self.__colorTags("-")
-      for task in self.tasks[-5:] if not all else self.tasks:
+      for task in self.tasks[:5] if not all else self.tasks:
         output.add_row(self.__preparerow(task))
       print output.get_string(border=False)
     else:
@@ -158,13 +142,13 @@ class Taskr():
 
   def closeCurrentTask(self):
     try:
-      if self.tasks[-1]["status"] == 1:
+      if self.tasks[-1].status == 1:
         last_task = self.tasks[-1]
-        last_task["status"] = 0
+        last_task.status = 0
         self.__stopCurrentSession(last_task)
         self.tasks.pop()
         i = -1
-        while self.tasks[i] is not None and self.tasks[i]["status"] != 0:
+        while self.tasks[i] is not None and self.tasks[i].status != 0:
           i = i - 1
         self.tasks.insert(i+1,last_task) if i != -1 else self.tasks.append(last_task)
         self.printTask(last_task)
@@ -179,9 +163,9 @@ class Taskr():
 
   def pauseCurrentTask(self):
     try:
-      if self.tasks[-1]["status"] == 1:
+      if self.tasks[-1].status == 1:
         last_task = self.tasks[-1]
-        last_task["status"] = 2
+        last_task.status = 2
         self.__stopCurrentSession(last_task)
       else:
         raise NoTaskException("")
@@ -189,7 +173,7 @@ class Taskr():
       pass
 
   def __findtask(self,tid):
-    tasks = [element for element in self.tasks if str(element['id'])[0:8] == str(tid)]
+    tasks = [element for element in self.tasks if str(element.id)[0:8] == str(tid)]
     if len(tasks) > 1:
       raise Exception("Duplicate task id")
     elif len(tasks) < 1:
@@ -218,23 +202,23 @@ class Taskr():
   def resumeCurrentTask(self,task_id=True):
     try:
       last_task = self.__findtask(task_id) if task_id != True else self.tasks[-1]
-      if last_task["status"] == 0:
+      if last_task.status == 0:
         raise Exception("Closed task")
       else:
         self.tasks.remove(last_task)
         self.tasks.append(last_task)
-        last_task["status"] = 1
-        last_task["worklog"][int(time.time())] = {"duration":0}
+        last_task.status = 1
+        last_task.worklog.append(WorkSession(int(time.time()),{"duration":0,"end_time":0}))
     except Exception as e:
       print e
       print colored("No paused task","cyan")
       self.printTasks()
 
+  # Corrected
   def __stopCurrentSession(self,last_task):
-    last_session_time = max(last_task["worklog"].iteritems(), key=operator.itemgetter(0))[0]
-    last_session = last_task["worklog"][last_session_time]
-    last_session["duration"] = (time.time() - last_session_time) / 3600
-    last_task["elapsed"] = last_task["elapsed"] + last_session["duration"]
+    last_session = last_task.last_session()
+    last_session.duration = (time.time() - last_session.start_time) / 3600
+    last_task.elapsed = last_task.elapsed + last_session.duration
 
   def deleteTask(self,task_id=True):
     try:
@@ -254,19 +238,105 @@ class Taskr():
       self.pauseCurrentTask()
     except NoTaskException as nte:
       pass
-    self.tasks.append(
-        {
-          "name" : name,
-          "id" : hashlib.sha1(name + " " + str(int(time.time()))).hexdigest(),
-          "tag" : tag,
-          "estimated" : estimated,
-          "elapsed" : 0,
-          "status" : 1,
-          "worklog" : {int(time.time()):{"duration":0}}
-          }
-        )
+    self.tasks.append(Task(
+      {
+        "name" : name,
+        "id" : hashlib.sha1(name + " " + str(int(time.time()))).hexdigest(),
+        "tag" : tag,
+        "estimated" : estimated,
+        "elapsed" : 0,
+        "status" : 1,
+        "worklog" : {int(time.time()):{"duration":0,"end_time":0}}
+        }
+      )
+      )
+
+class NoLastSessionException(Exception):
+
+  def __init__(self, message):
+    Exception.__init__(self, message)
 
 class NoTaskException(Exception):
 
   def __init__(self, message):
     Exception.__init__(self, message)
+
+#
+# name: "Tarea 1"
+# id: 1
+# status: 1 | 2 | 3 | 0      -> 1 active, 2 paused, 3 pending, 0 closed
+# tag: ""
+# worklog:
+#   -
+#     started_at: 1383167335
+#     duration: 3
+#   -
+#     started_at: 1383181735
+#     duration: 1
+
+# - elapsed: 0
+#   estimated: 0.0
+#   id: 00c870934d0ec536bb886cb2b20818a35cdef1ec
+#   name: aasads
+#   status: 1
+#   tag: null
+#   worklog:
+#     1403845568: {duration: 0,end_time: 0}
+#     1403845569: {duration: 0,end_time: 0}
+#     1403845570: {duration: 0,end_time: 0}
+#     1403845571: {duration: 0,end_time: 0}
+
+class Task(yaml.YAMLObject):
+  id = ""
+  name = ""
+  tag = "-"
+  estimated = 0.0
+  status = 3 # Pending
+  elapsed = 0
+  worklog = [] # WorkSession Array
+
+  def __init__(self, info):
+    self.id = info["id"]
+    self.name = info["name"]
+    self.tag = info["tag"]
+    self.estimated = info["estimated"]
+    self.status = info["status"]
+    self.elapsed = info["elapsed"]
+    w = []
+    for _time, _info in info["worklog"].iteritems():
+      w.append(WorkSession(_time, _info))
+    self.worklog = w
+
+  @staticmethod
+  def load_all(tasklog):
+    try:
+      return yaml.load(tasklog) or []
+      # yaml_tasks = yaml.load(tasklog) or []
+      # tasks = []
+      # for _t in yaml_tasks:
+      #   tasks.append(Task(_t))
+      # return tasks
+    except Exception as e:
+      print "Error loading tasks"
+      print e
+      logging.error(e)
+      sys.exit(1)
+
+  def last_session(self):
+    if len(self.worklog) > 0:
+      self.worklog.sort(key=lambda x: x.id) # I belive this is unnecesary
+      return self.worklog[-1] 
+    else:
+      raise NoLastSessionException("")
+
+
+
+class WorkSession(yaml.YAMLObject):
+  start_time = 0
+  end_time = 0
+  duration = 0
+
+  def __init__(self, start_time, info):
+    self.id = self.start_time = start_time
+    self.end_time = info["end_time"]
+    self.duration = info["duration"]
