@@ -1,14 +1,28 @@
+import datetime
 from math import ceil
 from termcolor import colored
-import datetime
+from prettytable import PrettyTable
 
 class Utils():
+
+  tags = {}
 
   readableStatus = {
       0:colored("Closed","cyan"),
       1:colored("Active","green"),
       2:colored("Paused","yellow",None,["blink"]),
       3:colored("Pending","magenta")}
+
+  colors = {
+      0:"grey",
+      1:"red",
+      2:"green",
+      3:"yellow",
+      4:"blue",
+      5:"magenta",
+      6:"cyan",
+      7:"white"
+      }
 
   @staticmethod
   def datefmt(time):
@@ -25,3 +39,18 @@ class Utils():
     minutes = Utils.roundup(dec*60,0)
     hours = Utils.roundup(time - dec,2)
     return str(int(hours))+"h "+str(int(minutes))+"m"
+
+  @staticmethod
+  def colorTags(tag):
+    if tag not in Utils.tags:
+      cindex = len(Utils.tags) % 8
+      Utils.tags[tag] = colored(tag,Utils.colors[cindex])
+    return Utils.tags[tag]
+
+  @staticmethod
+  def tableHeader():
+    return PrettyTable(["ID","Task","Tag","Last Worked On","Curr session","Total time","Status"])
+
+  @staticmethod
+  def tablefullHeader():
+    return PrettyTable(["ID","Task","Tag","Sessions","Last Worked On","Curr session","Total time","Status"])
