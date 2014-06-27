@@ -2,6 +2,7 @@
 
 import argparse
 from lib.taskr.Taskr import Taskr
+from lib.taskr.Exceptions import *
 
 if __name__ == "__main__":
 
@@ -25,7 +26,7 @@ if __name__ == "__main__":
   if args.i is not None:
     try:
       taskr.pauseCurrentTask()
-    except NoTaskException as nte:
+    except TaskNotFoundException as nte:
       print colored("No active task","red")
       taskr.printTasks()
   elif args.info is not None:
@@ -36,7 +37,7 @@ if __name__ == "__main__":
   elif args.c is not None:
     try:
       taskr.closeCurrentTask()
-    except NoTaskException as nte:
+    except TaskNotFoundException as nte:
       print colored("No active task","red")
       taskr.printTasks()
   elif args.o is not None:
@@ -46,7 +47,7 @@ if __name__ == "__main__":
   elif args.cr is not None:
     try:
       taskr.closeCurrentTask()
-    except NoTaskException as nte:
+    except TaskNotFoundException as nte:
       print colored("No active task","red")
       taskr.printTasks()
     taskr.resumeCurrentTask(args.cr)
