@@ -1,18 +1,15 @@
-import yaml, sys, logging, time, operator
+import yaml, sys, logging
 from termcolor import colored
 from prettytable import PrettyTable
 from os.path import expanduser
 from os.path import isdir
 from os import mkdir
-import hashlib
 from Utils import Utils
 from Exceptions import *
 from Task import Task
 from WorkSession import WorkSession
 
 class Taskr():
-
-  tasks = []
 
   taskslog_name = "task_log"
   errorlog = "error.log"
@@ -74,37 +71,39 @@ class Taskr():
       for element in Taskr.tasks:
         if element.id[0:8] == str(taskid):
           return element
-      exm = "Task "+str(tid)+" not found"
+      exm = "Task "+str(taskid)+" not found"
       raise TaskNotFoundException(exm)
-
-
-
-  def printTasks(self,all=False):
-    if len(Taskr.tasks) > 0:
-      print "Your current task log:"
-      output = Utils.tableHeader()
-      output.align["Task"]
-      Utils.tags["-"] = Utils.colorTags("-")
-      for task in Taskr.tasks[:5] if not all else Taskr.tasks:
-        output.add_row(task.to_row())
-      print output.get_string(border=False)
-    else:
-      print "You currently don't have any registered tasks"
-
-  def taskInfo(self,tid):
-    try:
-      task = Taskr.find(tid)
-      self.printTask(task)
-    except Exception as e:
-      print e
 
   def printTask(self,task=None):
     if task is None:
       return False
-    output = Utils.tablefullHeader()
+    output = Utils.tableHeader(True)
     output.align["Task"]
+    Utils.tags["-"] = Utils.colorTags("-")
     output.add_row(task.to_row(True))
     print output.get_string(border=False)
+
+  def printTasks(self,all=False,detailed=False):
+    if len(Taskr.tasks) > 0:
+      print "Your current task log:"
+      output = Utils.tableHeader(detailed)
+      output.align["Task"]
+      Utils.tags["-"] = Utils.colorTags("-")
+      for task in Taskr.tasks[-5:] if not all else Taskr.tasks:
+        output.add_row(task.to_row(detailed))
+      print output.get_string(border=False)
+    else:
+      print "You currently don't have any registered tasks"
+
+  def taskInfo(self,specific_task = False):
+    try:
+      if specific_task:
+        task = Taskr.find(specific_task)
+        self.printTask(task)
+      else:
+        self.printTasks(True,True)
+    except Exception as e:
+      print e
 
   def closeCurrentTask(self):
     try:
@@ -134,7 +133,6 @@ class Taskr():
     except IndexError as ie:
       raise TaskNotFoundException("")
 
-
   # TODO
   def openTask(self,task_id=None):
     try:
@@ -143,9 +141,9 @@ class Taskr():
       pass
     try:
       task = Taskr.find(task_id)
-      if task["status"] == 0:
-        task["status"] = 1
-        task["worklog"][int(time.time())] = {"duration":0}
+      if task.status == 0:
+        task.status = 1
+        task.start()
         Taskr.tasks.remove(task)
         Taskr.tasks.append(task)
         print "Reopened task: "+task_id

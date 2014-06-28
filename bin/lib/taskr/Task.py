@@ -22,30 +22,34 @@
 #     1403845569: {duration: 0,end_time: 0}
 #     1403845570: {duration: 0,end_time: 0}
 #     1403845571: {duration: 0,end_time: 0}
-import yaml
+import yaml, hashlib, time
 from WorkSession import WorkSession
 from Utils import Utils
 class Task(yaml.YAMLObject):
 
-  id = ""
-  name = ""
-  location = ""
-  tag = "-"
-  estimated = 0.0
-  status = 3 # Pending
-# status: 1 | 2 | 3 | 0      -> 1 active, 2 paused, 3 pending, 0 closed
-  elapsed = 0
-  worklog = [] # WorkSession Array
 
   def __init__(self, info):
+    # default values 
+    self.id = ""
+    self.name = ""
+    self.location = ""
+    self.tag = "-"
+    self.estimated = 0.0
+    self.status = 3 # Pending
+  # self.status: 1 | 2 | 3 | 0      -> 1 active, 2 paused, 3 pending, 0 closed
+    self.elapsed = 0
+
     self.id = hashlib.sha1(info["name"] + " " + str(int(time.time()))).hexdigest()
     self.name = info["name"]
     self.tag = info["tag"]
     self.estimated = info["estimated"]
+    self.worklog = [] # WorkSession Array
+
 
   def start(self):
     self.status = 1
-    self.worklog = [WorkSession()]
+    w = WorkSession()
+    self.worklog = self.worklog + [w]
     return True
 
   def pause(self):

@@ -48,9 +48,7 @@ class Utils():
     return Utils.tags[tag]
 
   @staticmethod
-  def tableHeader():
+  def tableHeader(full=False):
+    if full:
+      return PrettyTable(["ID","Task","Tag","Sessions","Last Worked On","Curr session","Total time","Status"])
     return PrettyTable(["ID","Task","Tag","Last Worked On","Curr session","Total time","Status"])
-
-  @staticmethod
-  def tablefullHeader():
-    return PrettyTable(["ID","Task","Tag","Sessions","Last Worked On","Curr session","Total time","Status"])
