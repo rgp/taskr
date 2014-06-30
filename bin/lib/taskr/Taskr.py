@@ -14,14 +14,15 @@ class Taskr():
   taskslog_name = "task_log"
   errorlog = "error.log"
   taskr_path = ".taskr/"
+  root = "."
 
   def __init__(self):
     home = expanduser("~") + "/"
     if not isdir(home+".taskr"):
       mkdir(home + ".taskr") 
-    self.root = home + self.taskr_path
-    logging.basicConfig(filename=self.root + self.errorlog, level=logging.DEBUG)
-    self.taskslog_path = self.root + self.taskslog_name
+    Taskr.root = home + self.taskr_path
+    logging.basicConfig(filename=Taskr.root + self.errorlog, level=logging.DEBUG)
+    self.taskslog_path = Taskr.root + self.taskslog_name
     try:
       self.log = open(self.taskslog_path,"r+")
     except IOError as ioe:
@@ -130,6 +131,13 @@ class Taskr():
     try:
       last_task = Taskr.tasks[-1]
       last_task.pause()
+    except IndexError as ie:
+      raise TaskNotFoundException("")
+
+  def renewTaskAt(self,when):
+    try:
+      last_task = Taskr.tasks[-1]
+      last_task.renewAt(when)
     except IndexError as ie:
       raise TaskNotFoundException("")
 

@@ -32,7 +32,6 @@ class Task(yaml.YAMLObject):
     # default values 
     self.id = ""
     self.name = ""
-    self.location = ""
     self.tag = "-"
     self.estimated = 0.0
     self.status = 3 # Pending
@@ -75,6 +74,13 @@ class Task(yaml.YAMLObject):
       raise Exception("Closed task")
     else:
       return False
+
+  def renewAt(self,when):
+    last_session = self.last_session()
+    if last_session:
+      self.elapsed = self.elapsed + last_session.stop(when)
+    w = WorkSession()
+    self.worklog = self.worklog + [w]
 
   def __stopCurrentSession(self):
     last_session = self.last_session()
