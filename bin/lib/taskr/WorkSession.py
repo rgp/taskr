@@ -26,6 +26,10 @@ class WorkSession(yaml.YAMLObject):
     self.end_time = (int(time.time()) if when is None else when)
     self.duration = float(self.end_time - self.start_time) / 3600
     if hasattr(self, 'pid') and self.pid is not None:
+      try:
+        os.kill(self.pid, signal.SIGINT)
+      except Exception as e:
+        pass
       del self.pid 
     return self.duration
 

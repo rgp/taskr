@@ -190,8 +190,6 @@ class Taskr():
       self.pauseCurrentTask()
     except TaskNotFoundException as nte:
       pass
-    Taskr.tasks.append(Task({
-      "name": name,
-      "tag": tag,
-      "estimated": estimated,
-      }))
+    t = Task({ "name": name, "tag": tag, "estimated": estimated, })
+    t.start()
+    Taskr.tasks.append(t)
