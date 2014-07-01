@@ -25,6 +25,11 @@ class WorkSession(yaml.YAMLObject):
   def stop(self,when = None):
     self.end_time = (int(time.time()) if when is None else when)
     self.duration = float(self.end_time - self.start_time) / 3600
+    if self.duration < 0:
+      print "start " + Utils.datefmt(self.start_time)
+      print "end " + Utils.datefmt(self.end_time)
+      print "negative duration"
+      sys.exit(3)
     if hasattr(self, 'pid') and self.pid is not None:
       try:
         os.kill(self.pid, signal.SIGINT)

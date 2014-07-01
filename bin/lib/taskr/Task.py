@@ -89,7 +89,7 @@ class Task(yaml.YAMLObject):
 
   def last_session(self):
     if len(self.worklog) > 0:
-      self.worklog.sort(key=lambda x: x.id) # I belive this is unnecesary
+      # self.worklog.sort(key=lambda x: x.id) # I belive this is unnecesary
       return self.worklog[-1] 
     else:
       return False

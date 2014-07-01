@@ -4,7 +4,7 @@ from sys import stdin
 from lib.taskr.Utils import Utils
 from lib.taskr.Taskr import Taskr
 
-step = 5
+step = 10
 last_checkpoint = current_checkpoint = int(time.time())
 wsid = "NOID"
 alive=True
