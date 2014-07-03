@@ -23,6 +23,10 @@ class WorkSession(yaml.YAMLObject):
 
 
   def stop(self,when = None):
+    print "lets stop"
+    print when
+    print "now"
+    print time.time()
     self.end_time = (int(time.time()) if when is None else when)
     self.duration = float(self.end_time - self.start_time) / 3600
     if self.duration < 0:

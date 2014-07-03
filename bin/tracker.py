@@ -28,6 +28,8 @@ def write_time(tracking_file):
   tracking_file.write(str(current_checkpoint))
 
 def read_time(tracking_file):
+  global last_checkpoint
+  global current_checkpoint
   # print "read %d" % current_checkpoint
   tracking_file.seek(0)
   last_checkpoint = int(tracking_file.read())
@@ -37,6 +39,8 @@ def read_time(tracking_file):
 
 def renew(tracking_file):
   t = Taskr()
+  print "RENEW AT "
+  print last_checkpoint
   t.renewTaskAt(last_checkpoint)
   t.saveTasks()
 
@@ -47,5 +51,5 @@ while(alive):
   current_checkpoint = int(time.time())
   read_time(o)
 o.close()
-os.rename(path + wsid + ".ttmp",path + wsid + ".DEL")
+os.remove(path + wsid + ".ttmp")
 sys.exit(0)

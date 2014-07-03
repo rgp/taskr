@@ -19,7 +19,8 @@ if __name__ == "__main__":
   parser.add_argument("-d", metavar="", nargs="?", const=True, help='Close current task')
   parser.add_argument("-s", metavar="", nargs="?", const=True, help='Show taskr status')
   parser.add_argument("--all", metavar="", nargs="?", const=True, help='Show all taskr status')
-  parser.add_argument("--info", metavar="", nargs="?", const=False, help='Show all taskr status')
+  parser.add_argument("--info", metavar="", nargs="?", const=False, help='Show detailed info')
+  parser.add_argument("--tag", metavar="", nargs="?", const=False, help='Show report by tag')
   args = parser.parse_args()
 
   taskr = Taskr()
