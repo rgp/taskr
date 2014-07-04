@@ -169,7 +169,6 @@ class Taskr():
       print colored("No paused task","cyan")
       self.printTasks()
 
-
   # TODO
   def deleteTask(self,task_id=True):
     try:

@@ -39,8 +39,6 @@ def read_time(tracking_file):
 
 def renew(tracking_file):
   t = Taskr()
-  print "RENEW AT "
-  print last_checkpoint
   t.renewTaskAt(last_checkpoint)
   t.saveTasks()
 

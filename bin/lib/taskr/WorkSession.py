@@ -21,18 +21,10 @@ class WorkSession(yaml.YAMLObject):
     open_session = subprocess.Popen(["python",path + "tracker.py",str(self.id)],preexec_fn=preexec_function)
     self.pid = open_session.pid
 
-
   def stop(self,when = None):
-    print "lets stop"
-    print when
-    print "now"
-    print time.time()
     self.end_time = (int(time.time()) if when is None else when)
     self.duration = float(self.end_time - self.start_time) / 3600
     if self.duration < 0:
-      print "start " + Utils.datefmt(self.start_time)
-      print "end " + Utils.datefmt(self.end_time)
-      print "negative duration"
       sys.exit(3)
     if hasattr(self, 'pid') and self.pid is not None:
       try:
@@ -44,5 +36,3 @@ class WorkSession(yaml.YAMLObject):
 
   def current_time(self):
     return Utils.roundup((time.time()-self.start_time)/3600,2)
-
-

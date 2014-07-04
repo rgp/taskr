@@ -1,27 +1,3 @@
-#
-# name: "Tarea 1"
-# id: 1
-# status: 1 | 2 | 3 | 0      -> 1 active, 2 paused, 3 pending, 0 closed
-# tag: ""
-# worklog:
-#   -
-#     started_at: 1383167335
-#     duration: 3
-#   -
-#     started_at: 1383181735
-#     duration: 1
-
-# - elapsed: 0
-#   estimated: 0.0
-#   id: 00c870934d0ec536bb886cb2b20818a35cdef1ec
-#   name: aasads
-#   status: 1
-#   tag: null
-#   worklog:
-#     1403845568: {duration: 0,end_time: 0}
-#     1403845569: {duration: 0,end_time: 0}
-#     1403845570: {duration: 0,end_time: 0}
-#     1403845571: {duration: 0,end_time: 0}
 import yaml, hashlib, time
 from WorkSession import WorkSession
 from Utils import Utils
