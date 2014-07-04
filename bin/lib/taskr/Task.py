@@ -28,9 +28,12 @@ class Task(yaml.YAMLObject):
     return True
 
   def pause(self):
-    self.status = 2
-    self.__stopCurrentSession()
-    return True
+    if self.status == 1:
+      self.status = 2
+      self.__stopCurrentSession()
+      return True
+    else:
+      return False
 
   def close(self):
     if self.status != 0:
