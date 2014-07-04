@@ -164,10 +164,15 @@ class Taskr():
     try:
       last_task = Taskr.find(task_id) if task_id != True else Taskr.tasks[-1]
       last_task.resume()
+      self.__upriseTask(last_task)
     except Exception as e:
       print e
       print colored("No paused task","cyan")
       self.printTasks()
+
+  def __upriseTask(self,task):
+    Taskr.tasks.remove(task)
+    Taskr.tasks.append(task)
 
   # TODO
   def deleteTask(self,task_id=True):
