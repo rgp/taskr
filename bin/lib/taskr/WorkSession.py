@@ -24,6 +24,7 @@ class WorkSession(yaml.YAMLObject):
 
   def stop(self,when = None):
     self.end_time = (int(time.time()) if when is None else when)
+    self.getGitInfo()
     self.duration = float(self.end_time - self.start_time) / 3600
     if self.duration < 0:
       sys.exit(3)
@@ -44,3 +45,15 @@ class WorkSession(yaml.YAMLObject):
     duration = Utils.hourstohuman(self.duration)
     cwd = self.cwd if hasattr(self, 'cwd') else "-"
     return ["",start_time,end_time,duration,cwd]
+
+  def getGitInfo(self):
+    cmd = ["git"]
+    args = [
+        "log",
+        "--oneline",
+        "--stat",
+        "--after='%s'" % Utils.gitDateFormat(self.start_time),
+        "--before='%s'"% Utils.gitDateFormat(self.end_time) if self.end_time is not None else "",
+        ]
+    gout = subprocess.check_output(cmd+args)
+    print gout

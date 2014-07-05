@@ -29,6 +29,10 @@ class Utils():
     return datetime.datetime.fromtimestamp(time).strftime('%y-%m-%d %H:%M')
 
   @staticmethod
+  def gitDateFormat(time):
+    return datetime.datetime.fromtimestamp(time).strftime('%Y-%m-%d %H:%M')
+
+  @staticmethod
   def roundup(number,decimals):
     val = pow(10,decimals)
     return ceil(number * val) / val
