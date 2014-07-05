@@ -24,7 +24,7 @@ class WorkSession(yaml.YAMLObject):
 
   def stop(self,when = None):
     self.end_time = (int(time.time()) if when is None else when)
-    self.getGitInfo()
+    # print self.getGitInfo()
     self.duration = float(self.end_time - self.start_time) / 3600
     if self.duration < 0:
       sys.exit(3)
@@ -44,16 +44,25 @@ class WorkSession(yaml.YAMLObject):
     start_time = Utils.datefmt(self.start_time)
     duration = Utils.hourstohuman(self.duration)
     cwd = self.cwd if hasattr(self, 'cwd') else "-"
-    return ["",start_time,end_time,duration,cwd]
+    return ["",start_time,end_time,duration,cwd,self.getGitInfo()]
 
   def getGitInfo(self):
-    cmd = ["git"]
-    args = [
-        "log",
-        "--oneline",
-        "--stat",
-        "--after='%s'" % Utils.gitDateFormat(self.start_time),
-        "--before='%s'"% Utils.gitDateFormat(self.end_time) if self.end_time is not None else "",
-        ]
-    gout = subprocess.check_output(cmd+args)
-    print gout
+    try:
+      cmd = ["git"]
+      args = [
+          "log",
+          "--oneline",
+          "--color",
+          # "--stat",
+          "--after='%s'" % Utils.gitDateFormat(self.start_time)
+          ]
+      args = args + (["--before='%s'"% Utils.gitDateFormat(self.end_time)] if self.end_time is not None else [])
+      git = subprocess.Popen(cmd+args,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+      gout = git.stdout.read().rstrip()
+      if len(gout) > 0:
+        return gout
+      else:
+        return "-"
+    except Exception as e:
+      print e
+      return ""

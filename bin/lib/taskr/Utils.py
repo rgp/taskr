@@ -30,7 +30,7 @@ class Utils():
 
   @staticmethod
   def gitDateFormat(time):
-    return datetime.datetime.fromtimestamp(time).strftime('%Y-%m-%d %H:%M')
+    return datetime.datetime.fromtimestamp(time).strftime('%Y-%m-%d %H:%M:%S')
 
   @staticmethod
   def roundup(number,decimals):
@@ -59,4 +59,4 @@ class Utils():
 
   @staticmethod
   def workSessionsTableHeader():
-    return PrettyTable(["","Start","End","Duration","Working Directory"])
+    return PrettyTable(["","Start","End","Duration","Working Directory","Related Commits"])
