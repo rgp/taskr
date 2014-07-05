@@ -83,6 +83,13 @@ class Taskr():
     Utils.tags["-"] = Utils.colorTags("-")
     output.add_row(task.to_row(True))
     print output.get_string(border=False)
+    print ""
+    print "Task worklog:"
+    wsess = Utils.workSessionsTableHeader()
+    wsess.align["Start"]
+    for ws in task.worklog:
+      wsess.add_row(ws.to_row())
+    print wsess.get_string(border=False)
 
   def printTasks(self,all=False,detailed=False):
     if len(Taskr.tasks) > 0:
@@ -162,9 +169,11 @@ class Taskr():
   # TODO
   def resumeCurrentTask(self,task_id=True):
     try:
-      last_task = Taskr.find(task_id) if task_id != True else Taskr.tasks[-1]
-      last_task.resume()
-      self.__upriseTask(last_task)
+      last_task = Taskr.tasks[-1]
+      last_task.pause()
+      task_to_resume = Taskr.find(task_id) if task_id != True else Taskr.tasks[-1]
+      task_to_resume.resume()
+      self.__upriseTask(task_to_resume)
     except Exception as e:
       print e
       print colored("No paused task","cyan")

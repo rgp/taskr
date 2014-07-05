@@ -11,9 +11,10 @@ class WorkSession(yaml.YAMLObject):
     # default values
     self.start_time = 0
     self.end_time = None
-    self.duration = 0
+    self.duration = 0.0
     self.location = ""
     self.pid = None
+    self.cwd = os.getcwd()
 
     self.id = self.start_time = int(time.time())
     encoding = sys.getfilesystemencoding()
@@ -36,3 +37,10 @@ class WorkSession(yaml.YAMLObject):
 
   def current_time(self):
     return Utils.roundup((time.time()-self.start_time)/3600,2)
+
+  def to_row(self):
+    end_time = Utils.datefmt(self.end_time) if self.end_time is not None else "-"
+    start_time = Utils.datefmt(self.start_time)
+    duration = Utils.hourstohuman(self.duration)
+    cwd = self.cwd if hasattr(self, 'cwd') else "-"
+    return ["",start_time,end_time,duration,cwd]

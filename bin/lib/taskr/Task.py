@@ -73,19 +73,19 @@ class Task(yaml.YAMLObject):
     else:
       return False
 
-  def to_row(self,with_sessions = False):
+  def to_row(self,detailed = False):
       last_session = self.last_session()
       if last_session:
         cur_sess_time = last_session.current_time() if self.status == 1 else 0
         total_time = Utils.roundup(self.elapsed + cur_sess_time,2) if self.status == 1 else self.elapsed
         cur_sess_time = Utils.hourstohuman(cur_sess_time)
         total_time = Utils.hourstohuman(total_time)
-        if with_sessions:
-          return [self.id[0:8],self.name,Utils.colorTags(self.tag),len(self.worklog), Utils.datefmt(last_session.start_time), cur_sess_time, total_time, Utils.readableStatus[self.status]]
+        if detailed:
+          return [self.id[0:8],self.name,Utils.colorTags(self.tag),Utils.hourstohuman(self.estimated),len(self.worklog), Utils.datefmt(last_session.start_time), cur_sess_time, total_time, Utils.readableStatus[self.status]]
         else:
           return [self.id[0:8],self.name,Utils.colorTags(self.tag), Utils.datefmt(last_session.start_time), cur_sess_time, total_time, Utils.readableStatus[self.status]]
       else:
-        if with_sessions:
-          return [self.id[0:8],self.name,Utils.colorTags(self.tag),len(self.worklog),"-", 0, 0, Utils.readableStatus[self.status]]
+        if detailed:
+          return [self.id[0:8],self.name,Utils.colorTags(self.tag),Utils.hourstohuman(self.estimated),len(self.worklog),"-", 0, 0, Utils.readableStatus[self.status]]
         else:
           return [self.id[0:8],self.name,Utils.colorTags(self.tag),"-", Utils.hourstohuman(0), Utils.hourstohuman(0), Utils.readableStatus[self.status]]
