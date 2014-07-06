@@ -87,6 +87,7 @@ class Taskr():
     print "Task worklog:"
     wsess = Utils.workSessionsTableHeader()
     wsess.align["Start"]
+    wsess.align["Related Commits"] = "l"
     for ws in task.worklog:
       wsess.add_row(ws.to_row())
     print wsess.get_string(border=False)

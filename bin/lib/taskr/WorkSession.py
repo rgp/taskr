@@ -15,6 +15,7 @@ class WorkSession(yaml.YAMLObject):
     self.location = ""
     self.pid = None
     self.cwd = os.getcwd()
+    self.commit_info = ""
 
     self.id = self.start_time = int(time.time())
     encoding = sys.getfilesystemencoding()
@@ -24,7 +25,7 @@ class WorkSession(yaml.YAMLObject):
 
   def stop(self,when = None):
     self.end_time = (int(time.time()) if when is None else when)
-    # print self.getGitInfo()
+    self.commit_info = self.getGitInfo()
     self.duration = float(self.end_time - self.start_time) / 3600
     if self.duration < 0:
       sys.exit(3)
@@ -44,7 +45,9 @@ class WorkSession(yaml.YAMLObject):
     start_time = Utils.datefmt(self.start_time)
     duration = Utils.hourstohuman(self.duration)
     cwd = self.cwd if hasattr(self, 'cwd') else "-"
-    return ["",start_time,end_time,duration,cwd,self.getGitInfo()]
+    if not hasattr(self, 'commit_info'):
+      self.commit_info = self.getGitInfo()
+    return ["",start_time,end_time,duration,cwd,self.commit_info]
 
   def getGitInfo(self):
     try:
@@ -65,4 +68,4 @@ class WorkSession(yaml.YAMLObject):
         return "-"
     except Exception as e:
       print e
-      return ""
+      return "-"
