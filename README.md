@@ -12,6 +12,9 @@ cd /usr/local/taskr
 
 # Install Requirements
 # Requires pip
+# INSTALL Python DEV tools python-dev
+# INSTALL Python PIP python-pip
+
 pip install -r requirements.txt
 
 # Add taskr to PATH
