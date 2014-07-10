@@ -1,9 +1,24 @@
 #!/usr/bin/env python 
 
-import argparse
+import argparse, subprocess, os
 from lib.taskr.Taskr import Taskr
 from lib.taskr.Exceptions import *
 
+def update():
+  try:
+    os.chdir('/usr/local/taskr')
+    cmd = ["git"]
+    args = [
+        "pull"
+        # , "github", "master"
+        ]
+    git = subprocess.Popen(cmd+args,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    gout = git.stdout.read().rstrip()
+    if len(gout) > 0:
+      print gout
+  except Exception as e:
+    print e
+    return "-"
 if __name__ == "__main__":
 
   parser = argparse.ArgumentParser(description='Taskr helps you keep track of time!')
@@ -21,6 +36,7 @@ if __name__ == "__main__":
   parser.add_argument("--all", metavar="", nargs="?", const=True, help='Show all taskr status')
   parser.add_argument("--info", metavar="", nargs="?", const=False, help='Show detailed info')
   parser.add_argument("--tag", metavar="", nargs="?", const=False, help='Show report by tag')
+  parser.add_argument("--update", metavar="", nargs="?", const=True, help='Update taskr')
   args = parser.parse_args()
 
   taskr = Taskr()
@@ -58,6 +74,8 @@ if __name__ == "__main__":
     taskr.printTasks(True)
   elif args.n is not None:
     taskr.newTask(args.n,args.e,args.t)
+  elif args.update is not None:
+    update()
   else:
     taskr.printTasks()
 
