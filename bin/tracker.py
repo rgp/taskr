@@ -15,6 +15,14 @@ def signal_handler(signal, frame):
   alive = False
 signal.signal(signal.SIGINT, signal_handler)
 
+def end_session(signal, frame):
+  global alive
+  alive = False
+  pause_task()
+  remove_file()
+  sys.exit(0)
+signal.signal(signal.SIGTERM, end_session)
+
 def open_file():
   global wsid
   global path
@@ -42,12 +50,21 @@ def renew(tracking_file):
   t.renewTaskAt(last_checkpoint)
   t.saveTasks()
 
+def pause_task():
+  t = Taskr()
+  t.pauseCurrentTask()
+  t.saveTasks()
+
+def remove_file():
+  global o
+  o.close()
+  os.remove(path + wsid + ".ttmp")
+
 o = open_file()
 while(alive):
   write_time(o)
   time.sleep(step)
   current_checkpoint = int(time.time())
   read_time(o)
-o.close()
-os.remove(path + wsid + ".ttmp")
+remove_file()
 sys.exit(0)
