@@ -38,7 +38,8 @@ class Task(yaml.YAMLObject):
   def close(self):
     if self.status != 0:
       self.status = 0
-      self.__stopCurrentSession()
+      if self.status != 2:
+        self.__stopCurrentSession()
       return True
     else:
       return False
