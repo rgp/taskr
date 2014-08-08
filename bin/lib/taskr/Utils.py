@@ -24,6 +24,14 @@ class Utils():
       7:"white"
       }
 
+
+  @staticmethod
+  def houronlyfmt(time):
+    return datetime.datetime.fromtimestamp(time).strftime('%H:%M')
+  @staticmethod
+  def dateonlyfmt(time):
+    return datetime.datetime.fromtimestamp(time).strftime('%y-%m-%d')
+
   @staticmethod
   def datefmt(time):
     return datetime.datetime.fromtimestamp(time).strftime('%y-%m-%d %H:%M')
@@ -60,3 +68,7 @@ class Utils():
   @staticmethod
   def workSessionsTableHeader():
     return PrettyTable(["","Start","End","Duration","Working Directory","Related Commits"])
+
+  @staticmethod
+  def weeklogHeader():
+      return PrettyTable(["Date","Session","Duration","Location","Task","Tag"])

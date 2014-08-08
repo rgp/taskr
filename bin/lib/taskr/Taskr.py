@@ -75,6 +75,43 @@ class Taskr():
       exm = "Task "+str(taskid)+" not found"
       raise TaskNotFoundException(exm)
 
+  def orderData(self):
+    self.weeklog = {}
+    for task in Taskr.tasks:
+      for session in task.worklog:
+        k = Utils.dateonlyfmt(session.start_time)
+        if k not in self.weeklog:
+          self.weeklog[k] = {}
+        q = Utils.houronlyfmt(session.start_time)
+        self.weeklog[k][q] = (task,session)
+    self.weeklog_total = 0
+
+    for (day,v) in self.weeklog.items():
+      total = 0
+      for (hour,(task,session)) in v.items():
+        total += session.duration
+      # self.weeklog[day]['total'] = total
+      self.weeklog_total += total
+
+
+  def printWeeklog(self):
+    if len(Taskr.tasks) > 0:
+      print "This weeks weeklog"
+      output = Utils.weeklogHeader()
+      output.align["Date"]
+      Utils.tags["-"] = Utils.colorTags("-")
+      self.orderData()
+
+      for (day,contents) in self.weeklog.items():
+        for (hour,(task,session)) in contents.items():
+          r = [day,hour,Utils.hourstohuman(session.duration),session.location,task.name,Utils.colorTags(task.tag)]
+          output.add_row(r)
+
+      print output.get_string(border=False)
+    else:
+      print "You currently don't have any registered tasks"
+
+
   def printTask(self,task=None):
     if task is None:
       return False

@@ -37,6 +37,7 @@ if __name__ == "__main__":
   parser.add_argument("--info", metavar="", nargs="?", const=False, help='Show detailed info')
   parser.add_argument("--tag", metavar="", nargs="?", const=False, help='Show report by tag')
   parser.add_argument("--update", metavar="", nargs="?", const=True, help='Update taskr')
+  parser.add_argument("--weeklog", metavar="", nargs="?", const=False, help='Show weeklog')
   args = parser.parse_args()
 
   taskr = Taskr()
@@ -48,6 +49,8 @@ if __name__ == "__main__":
       taskr.printTasks()
   elif args.info is not None:
     taskr.taskInfo(args.info)
+  elif args.weeklog is not None:
+    taskr.printWeeklog()
   elif args.d is not None:
     taskr.deleteTask(args.d)
     taskr.printTasks()
