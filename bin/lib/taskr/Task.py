@@ -1,8 +1,8 @@
 import yaml, hashlib, time
 from WorkSession import WorkSession
 from Utils import Utils
-class Task(yaml.YAMLObject):
 
+class Task(yaml.YAMLObject):
 
   def __init__(self, info):
     # default values 
@@ -19,7 +19,6 @@ class Task(yaml.YAMLObject):
     self.tag = info["tag"]
     self.estimated = info["estimated"]
     self.worklog = [] # WorkSession Array
-
 
   def start(self):
     self.status = 1

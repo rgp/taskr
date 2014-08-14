@@ -24,7 +24,6 @@ class Utils():
       7:"white"
       }
 
-
   @staticmethod
   def houronlyfmt(time):
     return datetime.datetime.fromtimestamp(time).strftime('%H:%M')

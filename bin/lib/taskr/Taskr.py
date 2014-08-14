@@ -76,23 +76,18 @@ class Taskr():
       raise TaskNotFoundException(exm)
 
   def orderData(self):
-    self.weeklog = {}
+    weeklog = {}
     for task in Taskr.tasks:
       for session in task.worklog:
-        k = Utils.dateonlyfmt(session.start_time)
-        if k not in self.weeklog:
-          self.weeklog[k] = {}
-        q = Utils.houronlyfmt(session.start_time)
-        self.weeklog[k][q] = (task,session)
+        k = session.start_time
+        weeklog[k] = (task,session)
+
+    self.weeklog = sorted(weeklog.iteritems(), key=lambda key_value: key_value[0])
+
     self.weeklog_total = 0
 
-    for (day,v) in self.weeklog.items():
-      total = 0
-      for (hour,(task,session)) in v.items():
-        total += session.duration
-      # self.weeklog[day]['total'] = total
-      self.weeklog_total += total
-
+    for (time,(task,session)) in self.weeklog:
+      self.weeklog_total += session.duration
 
   def printWeeklog(self):
     if len(Taskr.tasks) > 0:
@@ -102,10 +97,9 @@ class Taskr():
       Utils.tags["-"] = Utils.colorTags("-")
       self.orderData()
 
-      for (day,contents) in self.weeklog.items():
-        for (hour,(task,session)) in contents.items():
-          r = [day,hour,Utils.hourstohuman(session.duration),session.location,task.name,Utils.colorTags(task.tag)]
-          output.add_row(r)
+      for (time,(task,session)) in self.weeklog:
+        r = [Utils.dateonlyfmt(time),Utils.houronlyfmt(time),Utils.hourstohuman(session.duration),session.location,task.name,Utils.colorTags(task.tag)]
+        output.add_row(r)
 
       print output.get_string(border=False)
     else:
